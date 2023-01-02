@@ -14,7 +14,7 @@ if(!is_writable(PATH.'/monitors')) die('<h1>Monitors directory is not writable</
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Website Monitor</title>
+<title>KnightWatch</title>
 <meta charset="utf-8">
 <meta name="theme-color" content="#212529">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,7 +25,7 @@ if(!is_writable(PATH.'/monitors')) die('<h1>Monitors directory is not writable</
 
 <main>
 
-<h1>Website Monitor</h1>
+<h1>KnightWatch</h1>
 
 <?php
 
@@ -51,10 +51,10 @@ $monitors = json_decode(file_get_contents(PATH.'/monitors.json'));
 $i = 0;
 
 foreach($monitors as $monitor => $url) {
-	
+
 	$log = json_decode(file_get_contents(PATH.'/monitors/'.$monitor), TRUE);
 	$last = $log[array_key_last($log)];
-	
+
 	if(is_numeric($last['response'])) {
 		$last = ' <span class="status">HTTP/1.1 '.$last['response'].'</span>';
 		$class = 'good';
@@ -65,37 +65,37 @@ foreach($monitors as $monitor => $url) {
 		$class = 'bad';
 		$graph_color = '#fa5252';
 	}
-	
+
 	echo '<div class="item"><h2><span class="'.$class.'">⬤</span> '.$monitor.$last.'</h2>';
-	
+
 	if(file_exists(PATH.'/updates/'.$monitor.'.md')) {
 		$Parsedown = new Parsedown();
 		echo $Parsedown->text(file_get_contents(PATH.'/updates/'.$monitor.'.md'));
 	}
-	
+
 	$labels = array();
 	$data = array();
-	
+
 	$const = 'ctx'.$i;
 	$const_chart = $const.'_'.$const;
-	
+
 	echo '<div class="bloops">';
-	
+
 	// do we need bloop padding?
 	if(count($log) < 60) {
 		$diff = 59 - count($log);
-		
+
 		for ($x = 0; $x <= $diff; $x++) {
 			echo '<span class="bloop" title="Not monitored"></span>';
 		}
 	}
-	
+
 	foreach($log as $arr) {
-		
+
 		$labels[] = "'".date("H:i", $arr['timestamp'])."'";
-		
+
 		$data[] = @$arr['time'];
-		
+
 		if(@$arr['time'] > 0) {
 			echo '<span class="bloop good" data-status="Up" data-time="'.date("H:i", $arr['timestamp']).'" data-response="'.$arr['response'].'" data-ms="'.$arr['time'].'" data-status="Up at '.date("H:i", $arr['timestamp']).'" title="Up at '.date("H:i", $arr['timestamp']).' ('.$arr['time'].' ms)"></span>';
 		}
@@ -103,24 +103,24 @@ foreach($monitors as $monitor => $url) {
 			echo '<span class="bloop bad"></span>';
 		}
 	}
-	
+
 	$min = min($data);
 	$max = max($data);
-	
+
 	$diff = $max - $min;
-	
+
 	$max += ($diff / 3);
 	$min -= ($diff / 3);
-	
+
 	if($min < 0) $min = 0;
-	
+
 	echo '</div>';
-	
+
 	$chart_id = str_replace('.', '-', $monitor);
-	
+
 	$labels = implode(', ', $labels);
 	$data = implode(', ', $data);
-	
+
 	$out = <<<EOD
 <canvas id="$chart_id" width="300" height="100"></canvas>
 <script>
@@ -175,7 +175,7 @@ EOD;
 
 <footer>
 
-<p>Website Monitor is an open source project inspired by <a href="https://broke.lol">broke.lol</a>. <a href="https://github.com/neatnik/website-monitor">Download it on GitHub</a>.</p>
+<p>KnightWatch is powered by <a href="https://github.com/neatnik/website-monitor">website monitor</a>.</p>
 
 </footer>
 
